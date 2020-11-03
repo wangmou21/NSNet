@@ -5,7 +5,7 @@ clear all;
 close all;
 clc;
 
-type_struct = 'QSGS';              % 'SpherePacks', 'Fiber'
+type_struct = 'SpherePacks';              % 'SpherePacks', 'Fiber', 'QSGS'
 rwdata(type_struct)
 
 function [] = rwdata(type_struct)
@@ -27,6 +27,10 @@ function [] = rwdata(type_struct)
         data_temp = readmatrix(path_case);
         
         data = squeeze(data_temp(:,1));                            %结构信息
+        dim_s = nthroot(length(data),3);
+        data = reshape(data,[dim_s,dim_s,dim_s]);
+        data = data(1:200,1:200,1:200);
+        data = data(:);
         path_out_tmp = [path_output,poros_tmp{2},'/structure.mat'];
         mkdir([path_output,poros_tmp{2}]);
         save(path_out_tmp,'data');
@@ -40,6 +44,9 @@ function [] = rwdata(type_struct)
 %         h = slice(x1,y1,z1,s_3d,xs,ys,zs);
         
         data = squeeze(data_temp(:,2));                            % Mass信息
+        data = reshape(data,[dim_s,dim_s,dim_s]);
+        data = data(1:200,1:200,1:200);
+        data = data(:);
         path_out_tmp = [path_output,poros_tmp{2},'/Mass.mat'];
         save(path_out_tmp,'data');
         
@@ -51,6 +58,9 @@ function [] = rwdata(type_struct)
         data_temp = readmatrix(path_case);
     
         data = squeeze(data_temp(:,4));                             %温度信息
+        data = reshape(data,[dim_s,dim_s,dim_s]);
+        data = data(1:200,1:200,1:200);
+        data = data(:);
         path_out_tmp = [path_output,poros_tmp{2},'/Temp.mat'];
         save(path_out_tmp,'data');
         
@@ -61,6 +71,7 @@ function [] = rwdata(type_struct)
         path_case = [dir_data,type_struct, '_Flow/',dir_original(i).name,'/Vel_UZ.mat'];
         load(path_case);
         data = permute(imageVolUz,[3 1 2]);
+        data = data(1:200,1:200,1:200);
         data = data(:);
         path_out_tmp = [path_output,poros_tmp{2},'/Flow.mat'];
         save(path_out_tmp,'data');

@@ -12,6 +12,8 @@ dir_data(1:2) = [];
 dir_data(end) = [];
 
 num_case = length(dir_data);
+
+    list_poros = [];
 for i = 1:num_case
      
     path_file = [path_data,dir_data(i).name,'/S_porosity.mat'];
@@ -20,6 +22,7 @@ for i = 1:num_case
     poros_tmp = strsplit(dir_data(i).name,'_');
     path_out_tmp = [path_output,poros_tmp{2},'/structure.mat'];
     mkdir([path_output,poros_tmp{2}]);
+    S = S(1:200,1:200,1:200);
     S = S(:);
     save(path_out_tmp,'S');
         
@@ -38,8 +41,13 @@ for i = 1:num_case
 %        subplot(1,2,2);
 %     h = slice(x1,y1,z1,imageVolUz,xs,ys,zs);
 %     shading flat
+    imageVolUz = imageVolUz(1:200,1:200,1:200);
     imageVolUz = imageVolUz(:);
     path_out_tmp = [path_output,poros_tmp{2},'/Flow.mat'];
     save(path_out_tmp,'imageVolUz');
     
+    list_poros = [list_poros; str2num(poros_tmp{2})];
 end
+
+    name_save = ['../data/',type_struct,'_2/list_poros.mat'];
+    save(name_save,'list_poros');

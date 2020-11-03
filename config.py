@@ -11,15 +11,15 @@ import platform
 ## Set the path
 sys = platform.system()
 if sys == 'Windows':
-    dir_data = 'L:/NSNet/NSNet/data/'
-    workspace = 'L:/NSNet/NSNet/space'
+    dir_data = 'L:/NSNet/data/'
+    workspace = 'L:/NSNet/space'
 elif sys == "Linux":
     dir_data = '/home/mouwang/Work/NSNet/data/'
     workspace = '/home/mouwang/Work/NSNet/space'
     
 ## Set the task and data
-sub_task = 'Temp'                   # option for task, 'Temp' for temperature 
-type_train = 'SpherePacks'          # option for training data
+sub_task = 'Mass'                   # option for task, 'Temp' for temperature 
+type_train = 'QSGS'          # option for training data Fiber
 type_test = 'SpherePacks'
 
 ## Data setting
@@ -37,3 +37,11 @@ iteration_max = 30000
 
 cuda = True
 reduce_lr = True
+
+cuda = True
+
+# Mass
+dCdX = 1/(dim_s-1)
+Db = 1/6
+scale_Mass = 1E-2
+value_range_Mass = 1E-4
