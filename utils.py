@@ -17,7 +17,17 @@ import scipy.io as sio
 import config
 
 
-def loss_func_3d(output, target, refer, l_type='a', is_norm=True):
+def loss_mre(output, target):
+    error = abs(output - target)
+    error = error/target
+    if isinstance(error, torch.Tensor):
+        error = torch.mean(error)
+    else:
+        error = np.mean(error)      
+    return error
+
+
+def loss_mre3d(output, target, refer, l_type='a', is_norm=True):
     output = output[refer==0]
     target = target[refer==0]
       
@@ -53,6 +63,12 @@ def move_data_to_gpu(x, cuda):
 
     return x 
 
+def append_to_dict(dict, key, value):
+    if key in dict.keys():
+        dict[key].append(value)
+    else:
+        dict[key] = [value]
+
 
 def create_logging(log_dir, filemode):
     create_folder(log_dir)
@@ -77,15 +93,6 @@ def create_logging(log_dir, filemode):
     logging.getLogger('').addHandler(console)
     
     return logging
-
-
-
-
-
-
-
-
-
 
 
 

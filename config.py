@@ -19,7 +19,7 @@ elif sys == "Linux":
     
 ## Set the task and data
 sub_task = 'Mass'                   # option for task, 'Temp' for temperature 
-type_train = 'QSGS'          # option for training data Fiber
+type_train = 'SpherePacks'          # option for training data Fiber
 type_test = 'SpherePacks'
 
 ## Data setting
@@ -37,6 +37,7 @@ iteration_max = 30000
 
 cuda = True
 reduce_lr = True
+half_lr = True
 
 cuda = True
 

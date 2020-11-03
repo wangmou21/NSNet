@@ -203,7 +203,7 @@ class TestDataGenerator_Mass(object):
             batch_data_dict['target'] = target.astype(np.float32)
                      
             #data_mass_tmp = np.log(self.value_range*np.clip(data_mass_tmp,0,1)+1)-np.log(1-self.value_range*np.clip(data_mass_tmp,-1,0))
-            batch_data_dict['target3d'] = target3d_tmp/config.scale_Mass.astype(np.float32)
+            batch_data_dict['target3d'] = target3d_tmp/config.scale_Mass
             
             pointer += batch_size
             iteration += 1
