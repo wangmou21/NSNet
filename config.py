@@ -31,13 +31,14 @@ dim_s = 200
 scale_Temp = 100
 
 ratio_train_test = 0.92
-batch_size = 1
+batch_size = 20
 batch_size_test = 1
 iteration_max = 30000
 
 cuda = True
 reduce_lr = True
 half_lr = True
+early_stop = True
 
 cuda = True
 

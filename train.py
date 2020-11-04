@@ -100,9 +100,10 @@ def train():
     # Train on mini batches
     for batch_data_dict in data_generator.generate_train():
         
-        if iteration % 100 == 0:
+        if iteration % 10 == 0:
             logging.info('------------------------------------')
             logging.info('Iteration: {}'.format(iteration))
+            logging.info('Current learning rate: {lr:.6f}'.format(lr=optimizer.param_groups[0]['lr']))
             
             train_fin_time = time.time()
             validate_statistics_SpherePacks = evaluator_SpherePacks.evaluate(data_type='validate', max_iteration=None)          
@@ -115,8 +116,8 @@ def train():
             validate_statistics_container_Fiber.append_and_dump(iteration, validate_statistics_Fiber)
             
             
-            loss_validate = 0.5*validate_statistics_SpherePacks['mre']+validate_statistics_QSGS['mre']+validate_statistics_Fiber['mre']
-            loss_validate = loss_validate/2.5
+            loss_validate = validate_statistics_SpherePacks['mre']+validate_statistics_QSGS['mre']+validate_statistics_Fiber['mre']
+            loss_validate = loss_validate/3
             
             train_time = train_fin_time - train_bgn_time
             validate_time = time.time() - train_fin_time
@@ -129,20 +130,21 @@ def train():
             if config.half_lr:
                 if loss_validate >= prev_loss_validate:
                     val_no_impv += 1
-                    if val_no_impv >= 10:
+                    logging.info(val_no_impv)
+                    if val_no_impv >= 2:
                         halving = True
-                    if val_no_impv >= 20 and config.early_stop:
-                        print("No imporvement for 1500 iteration, early stopping.")
+                    if val_no_impv >= 3 and config.early_stop:
+                        logging.info("No imporvement for 1500 iteration, early stopping.")
                         break
                 else:
                     val_no_impv = 0
+            logging.info(halving)
                         
             if halving:
                 optim_state = optimizer.state_dict()
                 optim_state['param_groups'][0]['lr'] = optim_state['param_groups'][0]['lr'] / 2.0
                 optimizer.load_state_dict(optim_state)
-                print('Learning rate adjusted to: {lr:.6f}'.format(
-                    lr=optim_state['param_groups'][0]['lr']))
+                logging.info('Learning rate adjusted to: {lr:.6f}'.format(lr=optim_state['param_groups'][0]['lr']))
                 halving = False
             prev_loss_validate = loss_validate
 
