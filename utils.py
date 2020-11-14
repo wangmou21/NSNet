@@ -45,12 +45,47 @@ def loss_mre3d(output, target, refer, l_type='a', is_norm=True):
     return error
 
 
+def compute_norm_Flow(data_type, poros):
+
+    if data_type == 'SpherePacks':
+        norm_target3d = 2**(15.69*poros**3-23.87*poros**2 + 18.36*poros-9.38)
+    elif data_type == 'QSGS':
+        norm_target3d = 2**(17.02*poros**3-27.4*poros**2 + 16.83*poros-8.23)
+    elif data_type == 'Fiber':
+        norm_target3d = 2**(29.48*poros**3-53.44*poros**2 + 39.15*poros-16.6)    
+    return norm_target3d
+
+def computing_heat(material,temper):
+    
+    if isinstance(material, torch.Tensor):
+        material = material.detach().cpu().numpy()
+    if isinstance(temper, torch.Tensor):
+        temper = temper.detach().cpu().numpy()
+        
+    
+    shape_material = material.shape
+    DAORE1, DAORE2 = 0.023, 100
+    material[material==0] = DAORE1
+    material[material==1] = DAORE2
+    
+    ndim_mat = np.size(shape_material)
+    if ndim_mat==4:
+        temper = np.pad(temper,((0,0),(1,1),(0,0),(0,0)),'edge')
+        QT = np.mean((temper[:,0:shape_material[1],1:shape_material[1]-1,1:shape_material[1]-1]-temper[:,2:shape_material[1]+2,1:shape_material[1]-1,1:shape_material[1]-1])*material[:,:,1:shape_material[1]-1,1:shape_material[1]-1],(3,2))/2.
+        keff = np.sum(QT,ndim_mat-3)/(np.max(temper,(3,2,1))-np.min(temper,(3,2,1)))
+    elif ndim_mat==3:
+        temper = np.pad(temper,((1,1),(0,0),(0,0)),'edge')
+        QT = np.mean((temper[0:shape_material[1]]-temper[2:shape_material[1]+2])*material,(2,1))/2.
+        keff = np.sum(QT,ndim_mat-3)/(np.max(temper,(2,1))-np.min(temper,(2,1)))
+    
+    return keff
+
 
 def create_folder(fd):
     if not os.path.exists(fd):
         os.makedirs(fd)
         
-def move_data_to_gpu(x, cuda):
+def move_data_to_gpu(x, cuda=True):
     if 'float' in str(x.dtype):
         x = torch.Tensor(x)
     elif 'int' in str(x.dtype):

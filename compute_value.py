@@ -12,7 +12,7 @@ import scipy.io as sio
 
 import config
 
-data_type = 'QSGS'              # 'SpherePacks', 'QSGS'
+data_type = 'SpherePacks'              # 'SpherePacks', 'QSGS'
 
 
 

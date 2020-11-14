@@ -17,7 +17,7 @@ from sklearn.metrics import mean_absolute_error
 
 import config
 
-from utils import move_data_to_gpu, loss_mre, loss_mre3d, append_to_dict
+from utils import move_data_to_gpu, loss_mre, loss_mre3d, append_to_dict, compute_norm_Flow, computing_heat
 
 
 class Evaluator(object):
@@ -58,8 +58,8 @@ class Evaluator(object):
         
         logging.info('Data type: {}'.format(data_type))
         logging.info('Relative error of coefficient: {:.4f}'.format(error_mre))
-        logging.info('Absolute error of mass: {:.5f}'.format(error_mae3d))
-        logging.info('Relative error of mass: {:.4f}'.format(error_mre3d))
+        logging.info('Absolute error of field: {:.5f}'.format(error_mae3d))
+        logging.info('Relative error of field: {:.4f}'.format(error_mre3d))
 
         statistics = {
             'mre': error_mre,
@@ -122,10 +122,18 @@ def forward(model, generate_func, return_input=False, return_target=False):
         
         with torch.no_grad():
             model.eval()
-            batch_output_3d, batch_output = model(batch_feature)
+            batch_output_3d = model(batch_feature)
+            if config.sub_task == 'Flow':
+                norm_target3d = compute_norm_Flow(config.type_train, batch_data_dict['porosity'])
+                batch_output = torch.mean(batch_output_3d,(3,2,1))*norm_target3d*1E7/6
+            elif config.sub_task == 'Temp':
+                batch_output = computing_heat(batch_data_dict['input'],batch_output_3d*100)  
       
         append_to_dict(output_dict, 'output3d', batch_output_3d.data.cpu().numpy())
-        append_to_dict(output_dict, 'output', batch_output.data.cpu().numpy())
+        if config.sub_task == 'Temp':
+            append_to_dict(output_dict, 'output', batch_output)
+        else:
+            append_to_dict(output_dict, 'output', batch_output.data.cpu().numpy())
             
         if return_input:
             append_to_dict(output_dict, 'input', batch_data_dict['input'])

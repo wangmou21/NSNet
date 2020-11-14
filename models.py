@@ -145,16 +145,14 @@ class ConvBlock_Map(nn.Module):
         init_bn(self.bn1)
         init_bn(self.bn2)
         
-    def forward(self, x):
+    def forward(self, x, is_activate=True):
                          
         x = F.relu(self.bn1(self.conv1(x)), inplace=False)
-        x = self.bn2(self.conv2(x))
+        x = self.conv2(x)
+        if is_activate:
+            x = self.bn2(x)
         
         return x
-
-
-
-
 
 
 class MassNET(nn.Module):
@@ -198,3 +196,80 @@ class MassNET(nn.Module):
         
         #return output
         return out1, out2
+
+class FlowNET(nn.Module):
+    
+    
+    def __init__(self):
+        super(FlowNET, self).__init__()
+
+        self.conv_block1 = ConvBlock_Down(in_channels=1, out_channels=32)
+        self.conv_block_down1 = ConvBlock_Down(in_channels=32, out_channels=64)
+        self.conv_block_down2 = ConvBlock_Down(in_channels=64, out_channels=128)
+        self.conv_block_down3 = ConvBlock_Down(in_channels=128, out_channels=256)
+        
+        self.conv_block_up3 = ConvBlock_Up(in_channels=256, out_channels=128)
+        self.conv_block_up2 = ConvBlock_Up(in_channels=128, out_channels=64)
+        self.conv_block_up1 = ConvBlock_Up(in_channels=64, out_channels=64)
+        self.conv_block2 = ConvBlock_Map(in_channels=64, out_channels=1)
+
+    def forward(self, x):
+        
+        x = x[:, None, :, :, :]
+        
+        # Encoder
+        x1 = self.conv_block1(x, is_pool=False)
+        x2 = self.conv_block_down1(x1)
+        x3 = self.conv_block_down2(x2)
+        out1 = self.conv_block_down3(x3)
+        
+        # Decoder
+        out1 = self.conv_block_up3(out1, x3)
+        out1 = self.conv_block_up2(out1, x2)
+        out1 = self.conv_block_up1(out1, x1)
+        out1 = self.conv_block2(out1)
+        
+        out1 = out1.mul(1-x)  
+        out1 = torch.tanh(out1) 
+        
+        out1 = out1.squeeze(dim=1)
+        
+        
+        #return output
+        return out1
+
+class TempNET(nn.Module):
+    
+    
+    def __init__(self):
+        super(TempNET, self).__init__()
+
+        self.conv_block1 = ConvBlock_Down(in_channels=1, out_channels=32)
+        self.conv_block_down1 = ConvBlock_Down(in_channels=32, out_channels=64)
+        self.conv_block_down2 = ConvBlock_Down(in_channels=64, out_channels=128)
+        self.conv_block_down3 = ConvBlock_Down(in_channels=128, out_channels=256)
+        
+        self.conv_block_up3 = ConvBlock_Up(in_channels=256, out_channels=128)
+        self.conv_block_up2 = ConvBlock_Up(in_channels=128, out_channels=64)
+        self.conv_block_up1 = ConvBlock_Up(in_channels=64, out_channels=64)
+        self.conv_block2 = ConvBlock_Map(in_channels=64, out_channels=1)
+
+    def forward(self, x):
+        
+        x = x[:, None, :, :, :]
+        
+        # Encoder
+        x1 = self.conv_block1(x, is_pool=False)
+        x2 = self.conv_block_down1(x1)
+        x3 = self.conv_block_down2(x2)
+        out1 = self.conv_block_down3(x3)
+        
+        # Decoder
+        out1 = self.conv_block_up3(out1, x3)
+        out1 = self.conv_block_up2(out1, x2)
+        out1 = self.conv_block_up1(out1, x1)
+        out1 = self.conv_block2(out1, is_activate=False)
+        
+        out1 = out1.squeeze(dim=1)
+        
+        return out1

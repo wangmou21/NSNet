@@ -18,8 +18,8 @@ elif sys == "Linux":
     workspace = '/home/mouwang/Work/NSNet/space'
     
 ## Set the task and data
-sub_task = 'Mass'                   # option for task, 'Temp' for temperature 
-type_train = 'SpherePacks'          # option for training data Fiber
+sub_task = 'Temp'                   # option for task, 'Temp' for temperature 
+type_train = 'SpherePacks'#'SpherePacks'          # option for training data Fiber
 type_test = 'SpherePacks'
 
 ## Data setting
@@ -31,7 +31,7 @@ dim_s = 200
 scale_Temp = 100
 
 ratio_train_test = 0.92
-batch_size = 20
+batch_size = 2
 batch_size_test = 1
 iteration_max = 30000
 
@@ -46,4 +46,7 @@ cuda = True
 dCdX = 1/(dim_s-1)
 Db = 1/6
 scale_Mass = 1E-2
-value_range_Mass = 1E-4
+value_range = 1E-4
+
+# Flow
+scale_Flow = 7E-4

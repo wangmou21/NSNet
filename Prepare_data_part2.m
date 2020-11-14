@@ -23,8 +23,8 @@ for i = 1:num_case
     path_out_tmp = [path_output,poros_tmp{2},'/structure.mat'];
     mkdir([path_output,poros_tmp{2}]);
     S = S(1:200,1:200,1:200);
-    S = S(:);
-    save(path_out_tmp,'S');
+    data = S(:);
+    save(path_out_tmp,'data');
         
 %     subplot(1,2,1);
 %     dim_s = 201;
@@ -42,9 +42,9 @@ for i = 1:num_case
 %     h = slice(x1,y1,z1,imageVolUz,xs,ys,zs);
 %     shading flat
     imageVolUz = imageVolUz(1:200,1:200,1:200);
-    imageVolUz = imageVolUz(:);
+    data = imageVolUz(:);
     path_out_tmp = [path_output,poros_tmp{2},'/Flow.mat'];
-    save(path_out_tmp,'imageVolUz');
+    save(path_out_tmp,'data');
     
     list_poros = [list_poros; str2num(poros_tmp{2})];
 end
